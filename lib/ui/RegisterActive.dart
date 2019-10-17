@@ -189,7 +189,7 @@ class _RegisterActiveState extends State<RegisterActive> {
 
     // Enviando os dados para o back end
     http.post(url, body: {
-      //EDTPLACA.TEXT pega o valor que está dentro do campo Placa
+      //edtCodigo.text pega o valor que está dentro do campo Codigo e envia para a solicitação post
 
       "codigo": "${edtCodigo.text}",
       "name": "${edtDesc.text}"
