@@ -1,20 +1,31 @@
+import 'package:evs_prot/models/ResponsiblesModel.dart';
 import 'package:evs_prot/theme/Theme.dart' as Theme;
+import 'package:evs_prot/utils/databaseHelper.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-class RegisterActive extends StatefulWidget {
+class RegisterResponsibles extends StatefulWidget {
   @override
-  _RegisterActiveState createState() => _RegisterActiveState();
+  _RegisterResponsiblesState createState() => _RegisterResponsiblesState();
 }
 
-class _RegisterActiveState extends State<RegisterActive> {
+class _RegisterResponsiblesState extends State<RegisterResponsibles> {
   static GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
+
+  DatabaseHelper databaseHelper = DatabaseHelper();
+  List<Responsibles> responsibleList;
 
   //Definindo os controladores de cada texto, é necessário um controlador para cada campo
   //Com os controladores consigo pegar os valores que estão inseridos nos campos
   final TextEditingController edtCodigo = TextEditingController();
   final TextEditingController edtAnexo = TextEditingController();
   final TextEditingController edtDesc = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    var db = databaseHelper.initializeDatabase();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,9 +38,9 @@ class _RegisterActiveState extends State<RegisterActive> {
         body: SingleChildScrollView(
           child: Container(
             width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height >= 600
+            height: MediaQuery.of(context).size.height >= 700
                 ? MediaQuery.of(context).size.height
-                : 600,
+                : 700,
             decoration: BoxDecoration(gradient: Theme.ColorsTheme.gradient),
             child: SafeArea(
               minimum: EdgeInsets.only(top: 10),
@@ -135,9 +146,14 @@ class _RegisterActiveState extends State<RegisterActive> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         MaterialButton(
-                          onPressed: () {
+                          onPressed: () async {
                             if (_formKey.currentState.validate()) {
-                              print("Validado localmente");
+                              Responsibles responsibles = Responsibles(
+                                  "${edtCodigo.text}", "${edtDesc.text}");
+
+                              databaseHelper
+                                  .insertResponsible(responsibles)
+                                  .then((result) => print(result));
                             }
                           },
                           shape: RoundedRectangleBorder(
@@ -175,7 +191,26 @@ class _RegisterActiveState extends State<RegisterActive> {
                         )
                       ],
                     ),
-                  )
+                  ),
+                  MaterialButton(
+                    onPressed: () async {
+                      if (_formKey.currentState.validate()) {
+                        databaseHelper
+                            .getResponsibleMapList()
+                            .then((result) => print(result));
+                      }
+                    },
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5)),
+                    child: Text(
+                      "Recuperar dados locais",
+                      style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold),
+                    ),
+                    color: Colors.grey[350],
+                  ),
                 ],
               ),
             ),
@@ -200,3 +235,12 @@ class _RegisterActiveState extends State<RegisterActive> {
     });
   }
 }
+
+/*
+Responsibles responsibles = Responsibles(
+                                  "${edtCodigo.text}", "${edtDesc.text}");
+
+                              databaseHelper
+                                  .insertResponsible(responsibles)
+                                  .then((result) => print(result));
+ */
